@@ -15,6 +15,11 @@ const blankConfig = {
     "imageSequences":{},
     "lastImageSequence":""
 }
+let pictureProperties = {
+    x:0,
+    y:0,
+    size:720
+}
 // read in our configuration file
 if (!fs.existsSync('./config.json')){
     fs.writeFileSync('./config.json',JSON.stringify(blankConfig));
@@ -26,7 +31,6 @@ const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
-let invalidName = true;
 function updateConfigFile(){
     fs.writeFileSync(configPath, JSON.stringify(config));
 }
@@ -69,11 +73,12 @@ rl.question("To start, enter the name of an existing image sequence, type 'list'
         
     }
 })
+
+//this gets called once the user input has been evaluated and the program is ready to start
 function runServer(){
+    rl.close();
     const backgrounds = config.imgSequenceFolder;
 
-    let folder = 'imgsqnce/';
-    
     let images = [];
     let DFinternalFrame;
     //initializing the images
@@ -99,21 +104,32 @@ function runServer(){
     const io = new Server(server);
     
     app.use(cors());
-    //app.use(morgan('dev'));
+
     app.use(express.static('public'));
-    
+ 
     // Creating UDP server
     const UDPserver = udp.createSocket('udp4');
-    
+    let paused = false;
     function updateFrames() {
         io.emit('frameChange',frameCount);
     }
     function advanceFrame() {
-        frameCount ++;
-        updateFrames();
+        if(!paused){
+            frameCount ++;
+            updateFrames();
+        }
+        
     }
     function previousFrame(){
-        frameCount --;
+        if(!paused){
+            frameCount --;
+            updateFrames();   
+        }
+ 
+    }
+
+    function setFrame(frameSet){
+        frameCount = frameSet;
         updateFrames();
     }
     //Our HTTP listeners for integration with BOATS and the manual controller:
@@ -133,7 +149,9 @@ function runServer(){
         res.json(frameCount);
     })
     app.post('/setFrame', (req, res) => {
-    
+        frameCount = req.body.frame;
+        updateFrames();
+        res.json(frameCount);
     })
  
     //Our UDP listeners for integration with DragonFrame:
@@ -171,7 +189,24 @@ function runServer(){
         console.log('Error: ' + error);
         UDPserver.close();
       });
-    
+    //Our socket.io listeners for the controller
+    io.on("connect", (socket)=> {
+        io.emit("setImageProps", pictureProperties);
+        socket.on("togglePause",()=>{
+            paused = !paused;
+            console.log("eyy");
+            io.emit("pauseToggled",paused);
+        })
+        socket.on("setFrame", (frameValue)=>{
+            setFrame(frameValue);
+        })
+        socket.on("moveAndResize", (sizeObject)=>{
+            console.log(sizeObject);
+            pictureProperties = sizeObject;
+            io.emit("setImageProps", pictureProperties);
+        })
+    })
+
     // Port Number
     const port = 5000;
     // Server setup
