@@ -9,10 +9,12 @@ window.onload = () => {
     const xPositionForm = document.getElementById("x-position");
     const yPositionForm = document.getElementById("y-position");
     const sizeForm = document.getElementById("size");
+    const colorForm = document.getElementById("color");
     let pictureProperties = {
         x: 0,
         y: 0,
-        size: 0
+        size: 0,
+        color: '#000000'
     }
     pauseButton.addEventListener("click",()=>{
         socket.emit("togglePause");
@@ -35,11 +37,16 @@ window.onload = () => {
         pictureProperties.size = sizeForm.value;
         sendUpdatedAttributes();
     });
+    colorForm.addEventListener("change", () => {
+        pictureProperties.color = colorForm.value;
+        sendUpdatedAttributes();
+    })
     socket.on("setImageProps",(props) => {
         pictureProperties = props;
         xPositionForm.value = pictureProperties.x;
         yPositionForm.value = pictureProperties.y;
         sizeForm.value = pictureProperties.size;
+        colorForm.value = pictureProperties.color;
     })
     socket.on("frameChange", (frameNumber)=>{
         frameCount.value = frameNumber;

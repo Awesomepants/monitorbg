@@ -18,7 +18,8 @@ const blankConfig = {
 let pictureProperties = {
     x:0,
     y:0,
-    size:720
+    size:720,
+    color:"#000000"
 }
 // read in our configuration file
 if (!fs.existsSync('./config.json')){
@@ -35,7 +36,7 @@ function updateConfigFile(){
     fs.writeFileSync(configPath, JSON.stringify(config));
 }
 console.log("Welcome to MonitorBG!");
-rl.question("To start, enter the name of an existing image sequence, type 'list' to output a list of image Sequences, type 'new' to make a new image sequence, or type 'run' to run the server with the last image sequence given: ",(input) => {
+rl.question("To start, enter the name of an existing image sequence, type 'list' to output a list of image Sequences, or type 'new' to make a new image sequence: ",(input) => {
     if(config.imageSequences[input]){
         neededPath = JSON.parse(config.imageSequences[input]);
         console.log('step1');
@@ -65,9 +66,6 @@ rl.question("To start, enter the name of an existing image sequence, type 'list'
                 runServer();
             })
         })
-    } else if (input === 'run') {
-        neededPath = JSON.parse(config.lastImageSequence);
-        runServer();
     } else {
         console.log("I can't recognize this command. Press ctrl+c to exit and try again");
         
