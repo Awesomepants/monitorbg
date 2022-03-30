@@ -1,15 +1,17 @@
 window.onload = () => {
     const socket = io();
     const noJSwarning = document.getElementById("no-js-warning");
+    noJSwarning.style.display = "none";
     const frameCount = document.getElementById("frame-count");
     const frameSubmit = document.getElementById("frame-submit");
-    noJSwarning.style.display = "none";
     const pauseButton = document.getElementById("pause");
     const pauseStatusDisplay = document.getElementById("pause-status");
     const xPositionForm = document.getElementById("x-position");
     const yPositionForm = document.getElementById("y-position");
     const sizeForm = document.getElementById("size");
     const colorForm = document.getElementById("color");
+    const defaultButton = document.getElementById("default-button");
+    const fullscreenButton = document.getElementById("fullscreen-button");
     let pictureProperties = {
         x: 0,
         y: 0,
@@ -41,6 +43,10 @@ window.onload = () => {
         pictureProperties.color = colorForm.value;
         sendUpdatedAttributes();
     })
+    defaultButton.addEventListener("click", () => {
+        socket.emit("makeDefault", pictureProperties);
+    })
+    
     socket.on("setImageProps",(props) => {
         pictureProperties = props;
         xPositionForm.value = pictureProperties.x;

@@ -1,7 +1,6 @@
 //require our dependencies
 const express = require('express')
 const cors = require('cors')
-const morgan = require('morgan');
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
@@ -11,9 +10,16 @@ const UDPport = 8888;
 const { Buffer } = require('buffer');
 const readline = require('readline');
 const target = require('./getIPaddress');
+const open = require('open');
 const blankConfig = {
     "imageSequences":{},
-    "lastImageSequence":""
+    "lastImageSequence":"",
+    "image-settings":{
+        "x":0,
+        "y":0,
+        "size":720,
+        "color":"#000000"
+    }
 }
 let pictureProperties = {
     x:0,
@@ -21,12 +27,13 @@ let pictureProperties = {
     size:720,
     color:"#000000"
 }
-// read in our configuration file
+// read in our configuration file, or create it if it doesn't exist
 if (!fs.existsSync('./config.json')){
     fs.writeFileSync('./config.json',JSON.stringify(blankConfig));
 }
 const configPath = './config.json'
 const config = require(configPath);
+pictureProperties = config["image-settings"]
 let neededPath;
 const rl = readline.createInterface({
   input: process.stdin,
@@ -36,7 +43,11 @@ function updateConfigFile(){
     fs.writeFileSync(configPath, JSON.stringify(config));
 }
 console.log("Welcome to MonitorBG!");
-rl.question("To start, enter the name of an existing image sequence, type 'list' to output a list of image Sequences, or type 'new' to make a new image sequence: ",(input) => {
+console.log("Here are all the (case sensitive!) image sequences to choose from: ");
+        Object.keys(config.imageSequences).forEach((key) => {
+            console.log(`> ${JSON.stringify(key)}`);
+        })
+rl.question("To start, enter the name of an existing image sequence or type 'new' to make a new image sequence: ",(input) => {
     if(config.imageSequences[input]){
         neededPath = JSON.parse(config.imageSequences[input]);
         console.log('step1');
@@ -45,16 +56,10 @@ rl.question("To start, enter the name of an existing image sequence, type 'list'
         updateConfigFile();
         console.log('step3');
         runServer();
-    } else if (input === 'list') {
-        console.log("Here are all the (case sensitive!) image sequences to choose from: ");
-        Object.keys(config.imageSequences).forEach((key) => {
-            console.log(`> ${JSON.stringify(key)}`);
-        })
-        console.log("Press ctrl+c to quit, then restart the program.");
     } else if (input === 'new') {
         rl.question("Please input the absolute file path of the image sequence folder: ", (filePath) => {
             rl.question("Please input the name you would like to use for this image sequence (Note that if you use the name of an existing image sequence, it will be overwritten): ", (sequenceName) => {
-                if(sequenceName==="list" || sequenceName==="new" || sequenceName==="run"){
+                if(sequenceName==="new"){
                     sequenceName = `_${sequenceName}`;
                     console.log(`Your sequence has been names ${sequenceName} to avoid conflicting with the command names`);
                     
@@ -81,7 +86,7 @@ function runServer(){
     let DFinternalFrame;
     //initializing the images
     
-    console.log(neededPath);
+    
     console.log('Indexing images...');
     fs.readdir(path.resolve(neededPath), function (err, files) {
         //handling error
@@ -157,7 +162,6 @@ function runServer(){
     UDPserver.on('listening',function() {
         const UDPaddress = UDPserver.address();
         const UDPport = UDPaddress.port;
-        console.log(`UDP server is listening at port ${UDPport}`)
     })
     
     UDPserver.on('message',function(msg,info){
@@ -192,21 +196,27 @@ function runServer(){
         io.emit("setImageProps", pictureProperties);
         socket.on("togglePause",()=>{
             paused = !paused;
-            console.log("eyy");
             io.emit("pauseToggled",paused);
         })
         socket.on("setFrame", (frameValue)=>{
             setFrame(frameValue);
         })
         socket.on("moveAndResize", (sizeObject)=>{
-            console.log(sizeObject);
             pictureProperties = sizeObject;
             io.emit("setImageProps", pictureProperties);
+        })
+        
+        socket.on("makeDefault", (pictureProps)=>{
+            pictureProperties = pictureProps;
+            config["image-settings"] = pictureProperties;
+            console.log("writing to config file, do not close program...");
+            fs.writeFileSync(configPath, JSON.stringify(config));
+            console.log("writing complete");
         })
     })
 
     // Port Number
-    const port = 5000;
+    const port = 8888;
     // Server setup
     server.listen(port, () => {
         console.log(`MonitorBG is listening on PORT ${port}`);
@@ -220,6 +230,7 @@ function runServer(){
         console.log("Use ctrl+c to quit at any time");
     })
     UDPserver.bind(port);
+    open(`http://localhost:${port}/controller`);
     
 }
 

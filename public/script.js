@@ -1,5 +1,9 @@
 var socket = io();
-const image = document.getElementById("bg-image");
+window.onload = () => {
+    const image = document.getElementById("bg-image");
+    const elem = document.body;
+    const fullscreenButton = document.getElementById("fullScreenButton");
+    
 let imageProps = {
     x:0,
     y:0,
@@ -19,3 +23,16 @@ socket.on("frameChange", () => {
     console.log("frameChange");
     image.src=`/latestFrame?${new Date().getTime()}`;
 })
+function openFullscreen() {
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) { /* Safari */
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { /* IE11 */
+      elem.msRequestFullscreen();
+    }
+  }
+  image.addEventListener("click", openFullscreen);
+
+
+}
