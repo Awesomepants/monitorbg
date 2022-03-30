@@ -28,10 +28,10 @@ let pictureProperties = {
     color:"#000000"
 }
 // read in our configuration file, or create it if it doesn't exist
-if (!fs.existsSync('./config.json')){
-    fs.writeFileSync('./config.json',JSON.stringify(blankConfig));
+if (!fs.existsSync(path.join(process.cwd(), 'config.json'))){
+    fs.writeFileSync(path.join(process.cwd(), 'config.json'),JSON.stringify(blankConfig));
 }
-const configPath = './config.json'
+const configPath = path.join(process.cwd(), 'config.json');
 const config = require(configPath);
 pictureProperties = config["image-settings"]
 let neededPath;

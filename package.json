@@ -1,11 +1,19 @@
 {
-  "name": "nu",
+  "name": "monitorbg",
+  "bin": "server.js",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
+  },
+  "pkg": {
+    "targets":["node16-win-x64"],
+    "assets": [
+      "getIPaddress.js",
+      "public/**/*"
+    ]
   },
   "author": "",
   "license": "ISC",
@@ -19,6 +27,7 @@
     "http": "^0.0.1-security",
     "open": "^8.4.0",
     "path": "^0.12.7",
+    "pkg": "^5.5.2",
     "socket.io": "^4.4.1"
   }
 }
