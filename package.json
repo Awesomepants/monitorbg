@@ -3,13 +3,17 @@
   "bin": "server.js",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "startup.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "pkg": {
-    "targets":["node16-win-x64"],
+    "targets": [
+      "node16-win-x64"
+    ],
     "assets": [
       "getIPaddress.js",
       "public/**/*"
@@ -21,6 +25,7 @@
     "body-parser": "^1.19.2",
     "cors": "^2.8.5",
     "dgram": "^1.0.1",
+    "electron-squirrel-startup": "^1.0.0",
     "errorhandler": "^1.5.1",
     "express": "^4.17.3",
     "fs": "^0.0.1-security",
@@ -29,5 +34,40 @@
     "path": "^0.12.7",
     "pkg": "^5.5.2",
     "socket.io": "^4.4.1"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.63",
+    "@electron-forge/maker-deb": "^6.0.0-beta.63",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.63",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
+    "@electron-forge/maker-zip": "^6.0.0-beta.63",
+    "electron": "^18.1.0"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "monitorbg"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
   }
 }

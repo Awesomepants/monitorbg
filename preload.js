@@ -11,8 +11,8 @@ const { Buffer } = require('buffer');
 const readline = require('readline');
 const target = require('./getIPaddress');
 const open = require('open');
-
-console.log("app starting");
+const { dialog, ipcRenderer, ipcMain } = require('electron');
+/* Code stolen from server.js */
 const blankConfig = {
     "imageSequences":{},
     "lastImageSequence":"",
@@ -29,13 +29,40 @@ let pictureProperties = {
     size:720,
     color:"#000000"
 }
-// read in our configuration file, or create it if it doesn't exist
+
 if (!fs.existsSync(path.join(process.cwd(), 'config.json'))){
     fs.writeFileSync(path.join(process.cwd(), 'config.json'),JSON.stringify(blankConfig));
 }
 const configPath = path.join(process.cwd(), 'config.json');
 const config = require(configPath);
-pictureProperties = config["image-settings"]
+const imgSqnces = config.imageSequences;
+pictureProperties = config["image-settings"];
+/* Building the startup screen */
+
+window.addEventListener("DOMContentLoaded", () => {
+    const sequenceList = document.getElementById("FART");
+    const newSequence = document.getElementById("new-sequence");
+    const newNameForm = document.getElementById("name-input");
+    newSequence.addEventListener('click', async (event) => {
+        event.preventDefault();
+        const newName = newNameForm.value;
+        if(newName === ""){
+            alert("please choose a valid name");
+        } else {
+            ipcRenderer.send('hey-open-my-dialog-now',{name:newName});
+        }
+    })
+    Object.keys(imgSqnces).forEach((key) => {
+        li = document.createElement("li");
+        li.innerHTML = `<button> ${key}</button>`;
+        li.addEventListener('click',()=>{
+            runServer(key);
+        })
+        sequenceList.appendChild(li);
+    })
+
+})
+
 let neededPath;
 const rl = readline.createInterface({
   input: process.stdin,
@@ -44,14 +71,11 @@ const rl = readline.createInterface({
 function updateConfigFile(){
     fs.writeFileSync(configPath, JSON.stringify(config));
 }
-  // Creating express app 
-  const expressServer = express();
-  const server = http.createServer(expressServer);
-  expressServer.use(cors());
-  expressServer.post('/newsequence',(req, res, next) => {
-      console.log("heyyy")
-  })
+ 
 
+ipcRenderer.on('refresh',() => {
+    window.location.reload(true);
+})
 function startUp(){
     console.log("Welcome to MonitorBG!");
 console.log("Here are all the (case sensitive!) image sequences to choose from: ");
@@ -94,16 +118,16 @@ rl.question("To start, enter the name of an existing image sequence or type 'new
 
 
 //this gets called once the user input has been evaluated and the program is ready to start
-function runServer(){
+function runServer(sqnceName){
     rl.close();
-    const backgrounds = config.imgSequenceFolder;
-
-    let images = [];
-    let DFinternalFrame;
-    //initializing the images
+    let images = config.imageSequences[sqnceName];
+     // Creating express app 
+    const expressServer = express();
+    const server = http.createServer(expressServer);
+    expressServer.use(cors());
     
     
-    console.log('Indexing images...');
+    /*console.log('Indexing images...');
     fs.readdir(path.resolve(neededPath), function (err, files) {
         //handling error
         if (err) {
@@ -114,7 +138,7 @@ function runServer(){
     
             images.push(file);
         });
-    });
+    });*/
     console.log('Indexing Complete');
     let frameCount = 0;
   
@@ -152,7 +176,7 @@ function runServer(){
     //Our HTTP listeners for integration with BOATS and the manual controller:
     
     expressServer.get('/latestFrame',(req, res) => {
-        res.sendFile(path.join(neededPath,images[frameCount % images.length]));
+        res.sendFile(images[frameCount]);
     })
     expressServer.get('/connect',(req, res) => {
         res.json('Connection was successful');
@@ -233,7 +257,7 @@ function runServer(){
     const port = 8888;
     // Server setup
     server.listen(port, () => {
-        console.log(`MonitorBG is listening on PORT ${port}`);
+        /*console.log(`MonitorBG is listening on PORT ${port}`);
         console.log('Access the display by typing the following into any web browser: ');
     for( key in target){
         console.log(`${target[key]}:${port} (for ${key})`);
@@ -241,10 +265,10 @@ function runServer(){
         console.log(`or simply localhost:${port}, for this computer`);
     console.log('Connect DragonFrame by going to scene -> connections -> add connection, selecting "JSON" from the top down list, entering the folliwng into the text box, and then pressing "connect"');
     console.log(`127.0.0.1:${port}`);
-        console.log("Use ctrl+c to quit at any time");
+        console.log("Use ctrl+c to quit at any time");*/
     })
     UDPserver.bind(port);
-    open(`http://localhost:${port}/controller`);
+    open(`http://localhost:${port}`);
     
 }
 
