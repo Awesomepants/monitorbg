@@ -2,7 +2,7 @@
   "name": "monitorbg",
   "bin": "server.js",
   "version": "1.0.0",
-  "description": "",
+  "description": "Easily create stunning animated backgrounds for your stop motion animation",
   "main": "startup.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -19,7 +19,7 @@
       "public/**/*"
     ]
   },
-  "author": "",
+  "author": "Benjamin Waldal",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.2",
@@ -38,19 +38,19 @@
     "socket.io": "^4.4.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.17.10",
+    "@babel/preset-env": "^7.2.3",
+    "@babel/preset-react": "^7.0.0",
     "@electron-forge/cli": "^6.0.0-beta.63",
     "@electron-forge/maker-deb": "^6.0.0-beta.63",
     "@electron-forge/maker-rpm": "^6.0.0-beta.63",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
     "@electron-forge/maker-zip": "^6.0.0-beta.63",
-    "electron": "^18.1.0",
-    "@babel/core": "^7.2.2",
-    "@babel/preset-env": "^7.2.3",
-    "@babel/preset-react": "^7.0.0",
     "babel": "^6.23.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^8.0.4",
     "css-loader": "^2.1.0",
+    "electron": "^18.1.0",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "style-loader": "^0.23.1",
@@ -64,22 +64,9 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "monitorbg"
+            "iconUrl": "https://raw.githubusercontent.com/Awesomepants/monitorbg/main/icon.ico",
+            "setupIcon": "./icon.ico"
           }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {}
         }
       ]
     }

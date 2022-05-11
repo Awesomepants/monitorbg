@@ -1,6 +1,7 @@
 //imports
 
 const {app, BrowserWindow, dialog, ipcMain} = require('electron');
+if(require('electron-squirrel-startup')) app.quit();
 const path = require('path');
 const fs = require('fs');
 const express = require('express');
