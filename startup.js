@@ -10,7 +10,6 @@ const http = require('http');
 const { Server } = require('socket.io');
 const udp = require('dgram');
 const { Buffer } = require('buffer');
-const readline = require('readline');
 const target = require('./getIPaddress');
 const open = require('open');
 
@@ -34,10 +33,10 @@ const blankConfig = {
       "color":"#000000"
   }
 }
-if (!fs.existsSync(path.join(process.cwd(), 'config.json'))){
-  fs.writeFileSync(path.join(process.cwd(), 'config.json'),JSON.stringify(blankConfig));
+if (!fs.existsSync(path.join(__dirname, 'config.json'))){
+  fs.writeFileSync(path.join(__dirname, 'config.json'),JSON.stringify(blankConfig));
 }
-const configPath = path.join(process.cwd(), 'config.json');
+const configPath = path.join(__dirname, 'config.json');
 const config = require(configPath);
   // Port Number
   const port = 8888;
@@ -61,7 +60,7 @@ function runServer(sqnceName){
   
   
 
-  expressServer.use(express.static('public'));
+  expressServer.use(express.static(path.join(__dirname, 'public')));
 
   // Creating UDP server
   const UDPserver = udp.createSocket('udp4');
@@ -220,7 +219,6 @@ function createWindow () {
   // Some APIs can only be used after this event occurs.
   app.whenReady().then(() => {
     createWindow()
-    mainWindow.webContents.send('diahrrea', {config});
     ipcMain.on('hey-open-my-dialog-now', async (event, args) => {
       const name = args.name;
       const sequence = await dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
@@ -234,13 +232,16 @@ function createWindow () {
       const sequenceName = args.name;
       runServer(sequenceName);
     })
+    ipcMain.on('SendData',(event, args) => {
+      mainWindow.webContents.send('diahrrea', {config});
+    })
     app.on('activate', function () {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
       if (BrowserWindow.getAllWindows().length === 0) createWindow()
     })
   })
-  
+    
   // Quit when all windows are closed, except on macOS. There, it's common
   // for applications and their menu bar to stay active until the user quits
   // explicitly with Cmd + Q.

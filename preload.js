@@ -8,6 +8,8 @@ let DOMloaded = false;
 let imgSqnces;
 let config;
 
+/* Ask for our data */ 
+ipcRenderer.send('SendData');
 /* Building the startup screen */
 ipcRenderer.on('diahrrea', (event, args)=>{
     console.log("DIAHREA BETTER WIPE");
