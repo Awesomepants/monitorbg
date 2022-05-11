@@ -219,6 +219,7 @@ function createWindow () {
   // Some APIs can only be used after this event occurs.
   app.whenReady().then(() => {
     createWindow()
+    mainWindow.webContents.send('diahrrea', {config});
     ipcMain.on('hey-open-my-dialog-now', async (event, args) => {
       const name = args.name;
       const sequence = await dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
