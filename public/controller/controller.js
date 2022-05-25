@@ -11,7 +11,7 @@ window.onload = () => {
     const sizeForm = document.getElementById("size");
     const colorForm = document.getElementById("color");
     const defaultButton = document.getElementById("default-button");
-    const fullscreenButton = document.getElementById("fullscreen-button");
+    const blurForm = document.getElementById("blur");
     let pictureProperties = {
         x: 0,
         y: 0,
@@ -27,6 +27,10 @@ window.onload = () => {
     function sendUpdatedAttributes(){
         socket.emit("moveAndResize",pictureProperties);
     }
+    blurForm.addEventListener("change",()=>{
+        pictureProperties.blur = blurForm.value;
+        sendUpdatedAttributes();
+    })
     xPositionForm.addEventListener("change",()=>{
         pictureProperties.x = xPositionForm.value;
         sendUpdatedAttributes();

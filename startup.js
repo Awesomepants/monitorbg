@@ -30,7 +30,8 @@ const blankConfig = {
       "x":0,
       "y":0,
       "size":720,
-      "color":"#000000"
+      "color":"#000000",
+      "blur":0
   }
 }
 if (!fs.existsSync(path.join(__dirname, 'config.json'))){

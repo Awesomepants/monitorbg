@@ -59,10 +59,17 @@
   },
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "ignore":"config.json",
+        "icon":"icon.ico"
+      },
       "makers": [
         {
-          "name": "@electron-forge/maker-zip"
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "iconUrl": "https://raw.githubusercontent.com/Awesomepants/monitorbg/main/icon.ico",
+            "setupIcon": "./icon.ico"
+          }
         }
       ]
     }

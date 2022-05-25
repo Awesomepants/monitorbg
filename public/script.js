@@ -13,6 +13,7 @@ let imageProps = {
 socket.on("setImageProps", (props) => {
     imageProps = props;
     console.log("eyy");
+    image.style.filter = `blur(${imageProps.blur/10}px)`
     image.style.left = `${imageProps.x}px`;
     image.style.top =  `${imageProps.y * -1}px`;
     image.style.height = `${imageProps.size}px`;
