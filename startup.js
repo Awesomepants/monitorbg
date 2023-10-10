@@ -36,6 +36,7 @@ const blankConfig = {
 }
 if (!fs.existsSync(path.join(__dirname, 'config.json'))){
   fs.writeFileSync(path.join(__dirname, 'config.json'),JSON.stringify(blankConfig));
+
 }
 const configPath = path.join(__dirname, 'config.json');
 const config = require(configPath);
@@ -43,6 +44,7 @@ const config = require(configPath);
   const port = 8888;
 function updateConfigFile(){
   fs.writeFileSync(configPath, JSON.stringify(config));
+  //mainWindow.webContents.send('refresh');
 }
 pictureProperties = config["image-settings"];
 // The code that gets run once the image sequence has been selected and it's time to switch from sequence choosing mode to server running mode
@@ -232,6 +234,15 @@ function createWindow () {
       switchingModes = true;
       const sequenceName = args.name;
       runServer(sequenceName);
+    });
+    ipcMain.on('delete-sequence', (event, args) => {
+      const sequenceName = args.name;
+      if(config.imageSequences[sequenceName]){
+        delete config.imageSequences[sequenceName];
+        updateConfigFile();
+        mainWindow.webContents.send('refresh');
+        
+      }
     })
     ipcMain.on('SendData',(event, args) => {
       mainWindow.webContents.send('diahrrea', {config});

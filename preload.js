@@ -12,7 +12,6 @@ let config;
 ipcRenderer.send('SendData');
 /* Building the startup screen */
 ipcRenderer.on('diahrrea', (event, args)=>{
-    console.log("DIAHREA BETTER WIPE");
     config = args.config;
     imgSqnces = config.imageSequences;
     configLoaded = true;
@@ -29,7 +28,7 @@ const buildSequenceList = () => {
         event.preventDefault();
         const newName = newNameForm.value;
         if(newName === ""){
-            alert("please choose a valid name");
+            alert("please enter a name for the new image sequence");
         } else {
             ipcRenderer.send('hey-open-my-dialog-now',{name:newName});
         }
@@ -37,11 +36,25 @@ const buildSequenceList = () => {
 
         Object.keys(imgSqnces).forEach((key) => {
         li = document.createElement("li");
-        li.innerHTML = `<button> ${key}</button>`;
-        li.addEventListener('click',()=>{
-            ipcRenderer.send('start-server',{name:key})
-        })
+        li.innerHTML = `${key} <br/>`// <button>Use Image Sequence</button> <button>Delete Image Sequence</button> <br/>`;
+        useButton = document.createElement("button");
+        useButton.innerHTML = 'Use Image Sequence';
+        useButton.addEventListener('click',()=>{
+            ipcRenderer.send('start-server',{name:key});
+        });
+        li.appendChild(useButton);
+        deleteButton = document.createElement("button");
+        deleteButton.innerHTML = 'Delete Image Sequence';
+        deleteButton.addEventListener('click',()=>{
+            ipcRenderer.send('delete-sequence',{name:key});
+            //li.remove();
+        });
+        li.appendChild(deleteButton);
+        
+
+
         sequenceList.appendChild(li);
+
     })
     listBuilt = true;
 

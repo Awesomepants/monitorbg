@@ -1,7 +1,7 @@
 {
   "name": "monitorbg",
   "bin": "server.js",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Easily create stunning animated backgrounds for your stop motion animation",
   "main": "startup.js",
   "scripts": {
